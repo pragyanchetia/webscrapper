@@ -240,10 +240,14 @@ export async function addUserEmailToProduct(
   userEmail: string
 ) {
   try {
-    const {userId} = await auth();
-
     const product = await prisma.products.findUnique({
       where: { productId: productId as string },
+    });
+
+    const user = await prisma.users.findUnique({
+      where: {
+        email: userEmail
+      }
     });
 
     if (!product) {
@@ -252,21 +256,31 @@ export async function addUserEmailToProduct(
     };
 
     try { 
-      if (!userId) {
+      if (!user?.clerkId) {
         console.log("Authentication Failed!");
         return;
       }
   
       // // Add product to user's track list
-      await prisma.trackList.create({
-        data: {
+      await prisma.trackList.upsert({
+        where: {
+           email: user.email
+        },
+        create: {
           email: userEmail,
           products: {
             connect: {
-              productId,
-            },
-          },
+              productId
+            }
+          }
         },
+        update: {
+          products: {
+            connect: {
+              productId
+            }
+          }
+        }
       });
     } catch (error) {
       console.log("Error in trackAndStoreProduct!", error);
