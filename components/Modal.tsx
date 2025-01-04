@@ -7,20 +7,20 @@ import { addUserEmailToProduct } from "@/lib/actions";
 
 interface Props {
   productId: string;
+  checkUser: boolean;
 }
-const Modal = ({ productId }: Props) => {
+
+const Modal = ({ productId, checkUser }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [email, setEmail] = useState("");
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsSubmitting(true);
 
     try {
-      await addUserEmailToProduct(productId, email);
-      setEmail("");
+      await addUserEmailToProduct(productId);
       closeModal();
+      alert("Item Tracked!");
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
@@ -28,7 +28,11 @@ const Modal = ({ productId }: Props) => {
     }
   };
 
-  const openModal = () => setIsOpen(true);
+  const openModal = () => {
+    if (checkUser) {
+      setIsOpen(true);
+    } else alert("No user Found!");
+  };
   const closeModal = () => setIsOpen(false);
 
   return (
@@ -52,8 +56,6 @@ const Modal = ({ productId }: Props) => {
               >
                 <Dialog.Overlay className="fixed inset-0" />
               </Transition.Child>
-
-              {/* span tag is to center  */}
               <span
                 className="inline-block h-screen align-middle"
                 aria-hidden="true"
@@ -86,51 +88,25 @@ const Modal = ({ productId }: Props) => {
                           alt="close"
                           width={26}
                           height={26}
-                          className="cursor-pointer"
+                          className="cursor-pointer hover:scale-110 duration-300 transform"
                           onClick={closeModal}
                         />
                       </div>
-
-                      <h4>
+                      <h3>
                         Stay updated with product pricing alerts right in your
                         inbox!
-                      </h4>
+                      </h3>
+                      <p>You can untrack the product at any time</p>
                     </div>
-
-                    <form
-                      className="flex flex-col mt-5"
-                      onSubmit={handleSubmit}
-                    >
-                      <label
-                        htmlFor="email"
-                        className="text-sm font-medium text-gray-700"
+                    <div className="flex flex-col justify-center items-center">
+                      <button
+                        className="dialog-btn hover:bg-slate-800"
+                        type="button"
+                        onClick={handleSubmit}
                       >
-                        Email Address
-                      </label>
-
-                      <div className="dialog-input_container">
-                        <Image
-                          src={"/assets/icons/email.svg"}
-                          alt="mail"
-                          width={18}
-                          height={18}
-                        />
-
-                        <input
-                          type="email"
-                          required
-                          id="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Enter your email address"
-                          className="dialog-input"
-                        />
-                      </div>
-
-                      <button className="dialog-btn" type="submit">
-                        {isSubmitting ? "Submitting..." : "Track"}
+                        {isSubmitting ? "Tracking..." : "Are You Sure!"}
                       </button>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </Transition.Child>

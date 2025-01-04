@@ -95,19 +95,21 @@ export const sendEmail = async (
   sendTo: string | string[]
 ) => {
   if (!emailContent || !emailContent.subject || !emailContent.body) {
-    throw new Error("Invalid email content provided.");
+    console.log("Invalid email content provided.");
+    return false;
   }
 
   try {
-    console.log(sendTo);
-    await resend.emails.send({
-      from: "onboarding@resend.dev", // Replace with your verified Resend email
+    const what = await resend.emails.send({
+      from: "onboarding@resend.dev",
       to: sendTo,
       subject: emailContent.subject,
       html: emailContent.body,
     });
+
+    console.log(what);
   } catch (error) {
-    console.error("Error sending mail:", error);
+    console.log("Error sending mail:", error);
     return false;
   }
 };

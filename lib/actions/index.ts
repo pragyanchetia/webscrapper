@@ -177,6 +177,9 @@ export async function scrapeAndStoreProduct(productURL: string): Promise<Product
 //Get Specific Product:
 export async function getProductById(productId: string) {
   try {
+
+    const { userId } = await auth();
+    
     const product = await prisma.products.findUnique({
       where: {
         productId,
@@ -236,17 +239,19 @@ export async function getAllProducts() {
 }
 
 export async function addUserEmailToProduct(
-  productId: string,
-  userEmail: string
+  productId: string
 ) {
   try {
+
+    const {userId } = await auth();
+
     const product = await prisma.products.findUnique({
       where: { productId: productId as string },
     });
 
     const user = await prisma.users.findUnique({
       where: {
-        email: userEmail
+        clerkId: userId as string
       }
     });
 
@@ -267,7 +272,7 @@ export async function addUserEmailToProduct(
            email: user.email
         },
         create: {
-          email: userEmail,
+          email: user.email,
           products: {
             connect: {
               productId
@@ -288,7 +293,8 @@ export async function addUserEmailToProduct(
     }
 
     const emailContent = await generateEmailBody(product, "WELCOME");
-    await sendEmail(emailContent, userEmail);
+    await sendEmail(emailContent, user.email);
+
   } catch (error) {
     console.error("Error adding user email to product:", error);
   }

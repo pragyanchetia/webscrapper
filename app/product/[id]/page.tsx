@@ -7,22 +7,30 @@ import { Product } from "@/types";
 import PriceInfo from "@/components/PriceInfo";
 import Modal from "@/components/Modal";
 import React, { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 const ProductDetails = ({ params }: Props) => {
-  const { id } = React.use(params); // Unwrap the Promise to access `id`
+  const { id } = React.use(params); 
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const user = useUser();
+
+  const [checkUser, setCheckUser] = useState<boolean>(true);
 
   useEffect(() => {
     const getProduct = async () => {
       try {
         const product: Product | undefined = await getProductById(id);
         setProduct(product as Product);
+
+        if (!user) setCheckUser(!checkUser);
+
       } catch (error) {
         console.error("Error fetching product:", error);
       } finally {
@@ -130,7 +138,7 @@ const ProductDetails = ({ params }: Props) => {
               </Link>
             </button>
             
-            <Modal productId={id} />
+            <Modal productId={id} checkUser={checkUser}/>
           </div>
         </div>
       </div>
