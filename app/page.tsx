@@ -16,9 +16,7 @@ const Home = () => {
     const fetchData = async () => {
       try {
         if (isSignedIn && userId) {
-          console.log("Calling userOntoDatabase with userId:", userId);
           await userOntoDatabase(userId);
-          console.log("User saved to database.");
         }
       } catch (error) {
         console.error("Error fetching data or saving user:", error);

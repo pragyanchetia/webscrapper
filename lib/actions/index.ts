@@ -208,10 +208,14 @@ export async function getMyProducts() {
       return [];
     }
 
-    const myproducts = await prisma.trackList.findMany({
+    const myproducts = await prisma.products.findMany({
       where: {
-        email: userFromDB?.email
-      },
+        trackList: {
+          some: {
+            email: userFromDB?.email
+          }
+        }
+      }
     });
 
     return myproducts;

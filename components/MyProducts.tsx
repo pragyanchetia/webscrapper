@@ -24,8 +24,7 @@ export const MyProducts = () => {
     };
 
     fetchProducts();
-  }, []);
-  console.log("My Products:", myproducts);
+  }, []); 
 
   if (isLoading) {
     return (
